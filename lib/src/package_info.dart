@@ -9,6 +9,8 @@ class PackageInfo {
     this.packageName,
     this.appName,
     this.appIconByteArray,
+    this.versionCode,
+    this.versionName,
   });
 
   /// Construct class from the json map
@@ -18,11 +20,15 @@ class PackageInfo {
           packageName: map['packageName'],
           appIconByteArray: _eliminateNewLine(map['appIcon']),
           appName: map['appName'],
+          versionCode: map['versionCode'],
+          versionName: map['versionName'],
         );
 
   final String packageName;
   final String appName;
   final String appIconByteArray;
+  final String versionCode;
+  final String versionName;
 
   /// Get flutter's `Image` widget from the byte array of app icon
   Image getAppIcon({
@@ -41,7 +47,7 @@ class PackageInfo {
 
   @override
   String toString() =>
-      'Package: $packageName, AppName: $appName, IconByteArray size: ${appIconByteArray?.length}';
+      'Package: $packageName, AppName: $appName, IconByteArray size: ${appIconByteArray?.length}, VersionCode: $versionCode, VersionName: $versionName';
 }
 
 String _eliminateNewLine(String s) => s?.replaceAll('\n', '');

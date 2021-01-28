@@ -2,6 +2,7 @@ package dev.wurikiji.flutter_package_manager
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -33,7 +34,9 @@ class FlutterPackageManagerPlugin: MethodCallHandler {
               JSONMethodCodec.INSTANCE)
       channel.setMethodCallHandler(FlutterPackageManagerPlugin())
       sContext = registrar.context().applicationContext
-      Log.i(TAG, "Register with ${registrar.context().packageName}")
+      if(BuildConfig.DEBUG) {
+        Log.i(TAG, "Register with ${registrar.context().packageName}")
+      }
     }
   }
 
@@ -80,8 +83,9 @@ class FlutterPackageManagerPlugin: MethodCallHandler {
   private fun getPackageInfo(packageName: String) : java.util.HashMap<String, Any?>? {
     var info: java.util.HashMap<String, Any?>? = java.util.HashMap()
     try {
-      val appInfo: ApplicationInfo? = sContext!!.packageManager
-              .getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+      val pkgInfo: PackageInfo? = sContext!!.packageManager
+              .getPackageInfo(packageName, PackageManager.GET_META_DATA)
+      val appInfo: ApplicationInfo? = pkgInfo!!.applicationInfo
       val appName: String? = sContext!!.packageManager.getApplicationLabel(appInfo)?.toString()
       val appIcon: Drawable = sContext!!.packageManager.getApplicationIcon(appInfo?.packageName) ?: sContext!!.getDrawable(R.drawable.ic_launcher)
       val byteImage = drawableToBase64String(appIcon)
@@ -89,6 +93,8 @@ class FlutterPackageManagerPlugin: MethodCallHandler {
       info!!["packageName"] = appInfo?.packageName
       info["appName"] = appName
       info["appIcon"] = byteImage
+      info!!["versionCode"] = pkgInfo?.versionCode.toString()
+      info!!["versionName"] = pkgInfo?.versionName
     } catch (e: Exception) {
       Log.i(TAG, "$packageName not installed: $e")
         info = null
